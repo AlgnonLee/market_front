@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商城首页</title>
+</head>
+<body>
+    <div class="shell">
+        <div class="a">
+            <a href="/cpp/user_config" class="userimg"></a>
+        </div>
+        <div class="b"></div>
+        <div class="c">
+            <ul class="selections">
+                <li class="selection"><a href="/cpp/main">中心</a></li>
+                <li class="selection"><a href="/cpp/cart">购物车</a></li>
+                <li class="selection"><a href="/cpp/order">订单</a></li>
+                <li class="selection"><a href="/cpp/itemAdd">商品管理</a></li>
+            </ul>
+        </div>
+        <div class="d">
+            <div class="comodities" id="comodities">
+                <template>
+                    <el-table :data="tableData" border stripe style="width: 100%" max-height="700"
+                               >
+                        <el-table-column prop="oid" label="订单编号" width="180"></el-table-column>
+                        <el-table-column prop="price" label="价格" width="180"></el-table-column>
+                        <el-table-column prop="itemname" label="名称"></el-table-column>
+                        <el-table-column label="名称">
+                            <template slot-scope="scope">
+                                {{handleStatus(scope.row)}}
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="操作" width="270">
+                            <template slot-scope="scope">
+                                <el-button @click="handleGoBack(scope.$index, scope.row)">申请退款</el-button>
+                                <el-button @click="handleFee(scope.$index, scope.row)" type="primary" icon="el-icon-goods"></el-button>
+                                <el-button @click="handleDelete(scope.$index, scope.row)" type="danger" icon="el-icon-delete"></el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <el-dialog
+                            title="支付"
+                            :visible.sync="fee_dialog"
+                            width="50%"
+                    >
+                        <el-form :model="feeForm" ref="feeFormRef" label-width="70px">
+                            <el-form-item label="订单编号">
+                                <el-input v-model="feeForm.oid" disabled></el-input>
+                            </el-form-item>
+                            <el-form-item label="价格" prop="price">
+                                <el-input v-model="feeForm.price" disabled></el-input>
+                            </el-form-item>
+                            <el-form-item label="名称" prop="itemname">
+                                <el-input v-model="feeForm.itemname" disabled></el-input>
+                            </el-form-item>
+                            <el-form-item label="状态" prop="status">
+                                <el-input v-model="feeForm.status" disabled></el-input>
+                            </el-form-item>
+                        </el-form>
+                        <span slot="footer" class="dialog-footer">
+                                <el-button @click="fee_dialog = false">取 消</el-button>
+                                <el-button type="primary" @click="feeItemInfo">确 定</el-button>
+                            </span>
+                    </el-dialog>
+                </template>
+            </div>
+        </div>
+    </div>
+</body>
+<link rel="stylesheet" href="../static/css/main-order.css">
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/1.5.0/axios.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+
+    new Vue({
+        el:'#comodities',
+        data(){
+            return{
+                tableData:[],
+                fee_dialog:false,
+                feeForm:{}
+            }
+        },
+        mounted(){
+            this.getOrder();
+        },
+        methods:{
+            getOrder(){
+                let _this=this;
+                axios.get("/cpp/order_get").then(value => {
+                    _this.tableData=value.data;
+                })
+            },
+            handleStatus(row){
+                if(row.status===true){
+                    return "已支付";
+                }else {
+                    return "未支付";
+                }
+            },
+            handleGoBack(index,row){
+                if(row.status===false){
+                    this.$message("无法退款");
+                }else {
+                    let _this=this;
+                    this.$confirm("是否确认进行退款(确认后不可回退)").then(_=>{
+                        axios.post("/cpp/time_back",row).then(_=>{
+                            if(value.data===true){
+                                _this.$message("退款成功");
+                            }else {
+                                _this.$message("退款失败,请重试");
+                            }
+                            _this.getOrder();
+                        })
+                    })
+                }
+            },
+            handleFee(index,row){
+                if(row.status===true){
+                    this.$message("请勿重复付款");
+                }else {
+                    this.fee_dialog=true;
+                    this.feeForm=row;
+                }
+            },
+            feeItemInfo(){
+                let _this=this;
+                this.$confirm("要支付这个订单吗,支付款将从您的余额中扣取").then(_=>{
+                    axios.post("/cpp/order_pay",_this.feeForm).then(value => {
+                        if(value.data===true){
+                            _this.$message("支付成功");
+                        }else {
+                            _this.$message("支付失败,请检查账户余额或者等待商家补货");
+                        }
+                    })
+                })
+                console.log(_this.feeForm);
+            },
+            handleDelete(index,row){
+                let _this = this;
+                this.$confirm("删除订单不会退回消费的金额且无法恢复,要删除这个订单记录吗?").then(_=>{
+                    axios.post("/cpp/order_delete",row).then(value => {
+                        if(value.data===true){
+                            _this.$message("删除成功");
+                        }else {
+                            _this.$message("删除失败,请重试");
+                        }
+                        _this.getOrder();
+                    })
+                })
+            }
+        }
+    })
+</script>
+</html>

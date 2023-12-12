@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商城首页</title>
+</head>
+<body>
+<div class="shell">
+    <div class="a">
+        <a href="/cpp/user_config" class="userimg"></a>
+    </div>
+    <div class="b"></div>
+    <div class="c">
+        <ul class="selections">
+            <li class="selection"><a href="/cpp/main">中心</a></li>
+            <li class="selection"><a href="/cpp/cart">购物车</a></li>
+            <li class="selection"><a href="/cpp/order">订单</a></li>
+            <li class="selection"><a href="/cpp/itemAdd">商品管理</a></li>
+        </ul>
+    </div>
+    <div class="d">
+        <div class="comodities" id="comodities">
+            <template>
+                <el-tabs style="width: 300%">
+                    <el-tab-pane label="个人信息设置" name="first" v-model="userData">
+                        <el-form  label-width="70px">
+                            <el-form-item label="UID">
+                                <el-input v-model="userData.uid" disabled></el-input>
+                            </el-form-item>
+                            <el-form-item label="会员状态" prop="price">
+                                <el-input v-model="userData.role" disabled></el-input>
+                            </el-form-item>
+                        </el-form>
+                    </el-tab-pane>
+                    <el-tab-pane :model="newUserData" label="修改账号密码" name="second">
+                        <el-form label-width="100px" ref="newUserRef">
+<!--                            <el-form-item label="账号" prop="username">-->
+<!--                                <el-input v-model="userData.username" disabled></el-input>-->
+<!--                            </el-form-item>-->
+                            <el-form-item label="旧密码" prop="password_old">
+                                <el-input v-model="newUserData.password_old" show-password></el-input>
+                            </el-form-item>
+                            <el-form-item label="新密码" prop="password_new">
+                                <el-input v-model="newUserData.password_new" show-password></el-input>
+                            </el-form-item>
+                            <el-form-item label="确认新密码" prop="password_new_checked">
+                                <el-input v-model="newUserData.password_new_checked" show-password></el-input>
+                            </el-form-item>
+                            <el-button type="primary" @click="updateUserInfo">确 定</el-button>
+                        </el-form>
+                    </el-tab-pane>
+                    <el-tab-pane label="注销账号" name="third">
+                        <el-button type="primary" @click="Logout">登出账号</el-button>
+                        <el-button type="primary" @click="deleteUser">注销账号</el-button>
+                    </el-tab-pane>
+                </el-tabs>
+            </template>
+        </div>
+    </div>
+</div>
+</body>
+<link rel="stylesheet" href="../static/css/main.css">
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/1.5.0/axios.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.common.dev.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+    new Vue({
+        el:"#comodities",
+        data(){
+            return{
+                userData: [],
+                newUserData:[
+                    {password_old:''},
+                    {password_new:''},
+                    {password_new_checked:''},
+                ]
+            }
+        },
+        mounted(){
+            this.getUserData();
+        }
+        ,
+        methods:{
+            getUserData(){
+                let _this = this;
+                axios.post("/cpp/get_user_info").then(value => {
+                    _this.userData=value.data;
+                    console.log(_this.userData);
+                })
+            },
+            updateUserInfo(){
+                const reg = new RegExp('^[a-zA-Z][a-zA-Z0-9_]{4,15}$');
+                let _this=this;
+                if(this.newUserData.password_old!==this.userData.password){
+                    this.$message("旧密码输入错误");
+                    return;
+                }else if(!reg.test(this.newUserData.password_new)){
+                    this.$message("新密码格式错误");
+                    return;
+                }else if(this.newUserData.password_new!==this.newUserData.password_new_checked){
+                    this.$message("确认密码不一致");
+                    return;
+                }else {
+                    axios.post("/cpp/update_user_info",{},{
+                        params:{
+                            password:_this.newUserData.password_new_checked
+                        }
+                    }).then(value => {
+                        if(value.data){
+                            _this.$confirm("密码修改成功")
+                        }else {
+                            _this.$confirm("密码修改失败")
+                        }
+                    })
+                }
+            },
+            Logout(){
+                let _this = this;
+                this.$confirm("确定要退出登录吗?").this(_=>{
+                    axios.post("/cpp/user_logout")
+                }).then(value => {
+                    _this.$message("已退出登录");
+                })
+            },
+            deleteUser(){
+                let _this=this;
+                this.$confirm("真的要把账号注销掉吗?找不回来的喔?").then(_=>{
+                    _this.$confirm("再确认一遍,真的要把账号注销掉吗?找不回来的喔").then(_=>{
+                        axios.post("/cpp/delete_user_info").then(value => {
+                            _this.$message("账号已注销");
+                        })
+                    })
+                })
+            }
+        }
+    })
+</script>
+</html>

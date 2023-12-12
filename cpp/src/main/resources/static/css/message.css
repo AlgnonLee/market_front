@@ -1,0 +1,20 @@
+body{
+    display: flex;
+    justify-content: center;
+    background-color: antiquewhite;
+}
+
+div{
+    display: grid;
+    width: 20%;
+    text-align: center;
+    background-color:azure;
+    margin-top: 5%;
+    grid-template-rows: repeat(4,25%);
+    grid-template-columns: repeat(1,100%);
+}
+
+label{
+    height: 2em;
+    width: auto;
+}

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商城首页</title>
+</head>
+<body>
+    <div class="shell">
+        <div class="a">
+            <a href="/cpp/user_config" class="userimg"></a>
+        </div>
+        <div class="b"></div>
+        <div class="c">
+            <ul class="selections">
+                <li class="selection"><a href="/cpp/main">中心</a></li>
+                <li class="selection"><a href="/cpp/cart">购物车</a></li>
+                <li class="selection"><a href="/cpp/order">订单</a></li>
+                <li class="selection"><a href="/cpp/itemAdd">商品管理</a></li>
+            </ul>
+        </div>
+        <div class="d">
+            <div class="comodities" id="comodities">
+                    <template>
+                        <el-table
+                                ref="multipleTable"
+                                :data="tableData"
+                                tooltip-effect="dark"
+                                style="width: 100%"
+                                max-height="600"
+                                @selection-change="handlerSelectionChange">
+                            <el-table-column
+                                    type="selection"
+                                    width="55"
+                                    prop="cid">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="itemname"
+                                    label="商品名称"
+                                    width="120">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="store"
+                                    label="商店名称"
+                                    width="120">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="itemtype"
+                                    label="类型"
+                                    show-overflow-tooltip>
+                            </el-table-column>
+                            <el-table-column
+                                prop="price"
+                                label="价格"
+                                show-overflow-tooltip>
+                        </el-table-column>
+                        <el-table-column label="操作" width="270">
+                            <template slot-scope="scope">
+                                <el-button @click="handleDelete(scope.$index, scope.row)" type="danger" icon="el-icon-delete"></el-button>
+                            </template>
+                        </el-table-column>
+                        </el-table>
+                        <div style="margin-top: 20px">
+                            <el-button @click="sumUpGet">合并</el-button>
+                        </div>
+                    </template>
+            </div>
+        </div>
+    </div>
+</body>
+<link rel="stylesheet" href="../static/css/main-car.css">
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/1.5.0/axios.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<!--<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.5.2/vue.common.js"></script>-->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+
+    new Vue({
+        el:'#comodities',
+        data(){
+            return {
+                tableData:[],
+                selectList:[]
+            }
+        },
+        mounted(){
+            this.getItem()
+        },
+        methods:{
+            getItem(){
+                let _this=this;
+                // 获取商品，
+                axios.post("/cpp/cart_item_get").then(value => {
+                    _this.tableData=value.data;
+                })
+            },
+            handlerSelectionChange(val){
+                this.selectList=val;
+            },
+            sumUpGet: function () {
+                let _this = this;
+                for(let i = 0;i<this.selectList.length;i++)
+                axios.post("/cpp/cart_sumup",null,{
+                    params:{
+                        cid:_this.selectList[i].cid
+                    }
+                }).then(value => {
+                    if(value.data===false){
+                        _this.$message("商品:"+_this.selectList[i].itemname+"支付失败,请检查余额或等待商家补货");
+                    }else {};
+                })
+            },
+            handleDelete(index,row){
+                let _this=this;
+                this.$confirm("确认将 "+row.itemname+" 移出购物车吗?").then(_=>{
+                    axios.post("/cpp/remove_cart",row).then(_=>{
+                        _this.$message(row.itemname+"已移出购物车")
+                    })
+                })
+            }
+        }
+    })
+
+</script>
+</html>

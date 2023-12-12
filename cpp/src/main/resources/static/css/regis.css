@@ -1,0 +1,130 @@
+*{
+    padding: 0;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+body{
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    background-color: rgb(204, 204, 211);
+}
+
+div{
+    border-radius: 15px;
+    box-shadow: 1px 5px 5px rgb(230, 214, 214);
+}
+
+.main{
+    margin-top: 5%;
+    display: flex;
+    flex-direction: auto auto;
+}
+
+.pic{
+    width: 600px;
+    background-color: pink;
+    background-size: cover;
+    background-image: url("https://pic.ntimg.cn/file/20200419/23019538_180058235000_2.jpg");
+}
+
+input{
+    border: none;
+    border-radius: 20px;
+    height: 4em;
+    width: 20em;
+}
+
+.input{
+    margin-top: 2em;
+    margin-left: 2em;
+    margin-right: 2em;
+    box-shadow: none;
+}
+
+.a{
+    margin-top: 7.5em;
+    height: 4em;
+    box-shadow: none;
+    margin-left: 1em;
+}
+
+.b{
+    height: 2em;
+    margin-top: 4em;
+    margin-left: 1em;
+    box-shadow: none;
+}
+
+.c{
+    margin-top: 6em;
+}
+
+.login{
+    background-color: aliceblue;
+    margin-left: 0.5em;
+    display: flex;
+    flex-direction: auto;
+}
+
+.label{
+    margin-top: 1cm;
+    box-shadow: none;
+}
+
+button{
+    margin-top: -3em;
+    margin-bottom: 3em;
+    border: none;
+    /* border-radius: 1em; */
+    background-color: bisque;
+
+    height: 3em;
+    width: 5em;
+
+    font-size: larger;
+}
+
+a{
+    margin-left: 2em;
+    text-decoration: none;
+}
+
+ul{
+    list-style: none;
+}
+
+li label{
+    font-size: small;
+    margin-left: -9em;
+    transition: 0.5s;
+}
+
+li{
+    margin-top: 1em;
+}
+
+input[type=radio]{
+    appearance: none;
+    margin-left: -2em;
+    width: 2em;
+    position: relative;
+}
+
+#customer{
+    margin-left: -7em;
+}
+
+
+input[type=radio]+label{
+    width: 1em;
+    font-size: large;
+    margin-left: 3em;
+    text-align: center;
+}
+
+input[type=radio]:checked+label{
+    transition: 0.5s;
+    border-radius: 1em;
+    background-color: rgba(0, 255, 242, 0.418)
+}

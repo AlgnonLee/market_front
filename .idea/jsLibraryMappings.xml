@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JavaScriptLibraryMappings">
+    <file url="file://$PROJECT_DIR$" libraries="{Node.js Core, axios, element-ui, vue}" />
+    <file url="file://$PROJECT_DIR$/app" libraries="{Node.js Core, axios, element-ui, vue}" />
+    <file url="file://$PROJECT_DIR$/bpp" libraries="{Node.js Core, axios, element-ui, vue}" />
+    <file url="file://$PROJECT_DIR$/cpp" libraries="{Node.js Core, axios, element-ui, socket.io.esm, sockjs, stomp, sweetalert, sweetalert-dev, vue}" />
+    <file url="file://$PROJECT_DIR$/gateway" libraries="{Node.js Core, axios, element-ui, vue}" />
+  </component>
+</project>

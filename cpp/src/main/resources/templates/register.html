@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页</title>
+    <link rel="stylesheet" href="../static/css/regis.css">
+</head>
+<body>
+<div class="main">
+    <div class="pic">
+    </div>
+    <div class="login">
+        <form action="/cpp/user_register" method="post">
+            <div class="label">
+                <label for="">用户注册页面</label>
+            </div>
+            <div class="input">
+                <ul>
+                    <li><input type="text" name="username" placeholder=" 在这里输入你想使用的账号"></li>
+                    <li><label for="" ></label></li>
+                    <li><input type="password" name="password" placeholder=" 在这里输入密码"></li>
+                    <li><label for="" ></label></li>
+                    <li><input type="password" name="password1" placeholder=" 确认密码"></li>
+                    <li><label for="" ></label></li>
+                    <li>
+                        <input type="radio" name="role" id="customer" value="customer" checked="checked"><label for="customer">&nbsp;&nbsp;&nbsp;顾客&nbsp;&nbsp;&nbsp;</label>
+                        <input type="radio" name="role" id="shop" value="shop"><label for="shop">&nbsp;&nbsp;&nbsp;商户&nbsp;&nbsp;&nbsp;</label>
+                    </li>
+                </ul>
+            </div>
+            <div class="c">
+                <button type="submit" id="register">注册</button>
+                <a href="/">登录</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/1.5.0/axios.js"></script>
+<script>
+    var labels = document.querySelectorAll("label");
+    var lis = document.querySelectorAll("input");
+    const reg = new RegExp('^[a-zA-Z][a-zA-Z0-9_]{4,15}$');
+    var btn = document.getElementById("register");
+    var useable =false;
+    var legal = false;
+    var form = document.querySelectorAll('form');
+
+    // 判断账号密码是否合法
+    lis[0].addEventListener("blur",function(){
+        if(reg.test(lis[0].value)){
+            labels[1].innerHTML="账号合法";
+        }else{
+            labels[1].innerHTML="账号不合法";
+        }
+        axios.get('/cpp/register_check',{
+            params:{
+                username:lis[0].value
+            }
+        }).then(value => {
+            if(value.data){
+                // legal=false;
+                // console.log(value.data+typeof (value.data));
+                // labels[1].innerHTML="账号已被使用";
+                legal=true;
+            }else {
+                labels[1].innerHTML="账号已被使用";
+                legal=false;
+            }
+        })
+    })
+
+
+    lis[1].addEventListener("click",function(){
+        labels[2].hidden="";
+    })
+    lis[1].addEventListener("blur",function(){
+        if(reg.test(lis[1].value)){
+            labels[2].innerHTML="密码合法";
+        }else{
+            labels[2].innerHTML="密码不合法";
+        }
+    })
+    lis[2].addEventListener("click",function(){
+        labels[3].hidden="";
+    })
+    lis[2].addEventListener("blur",function(){
+        if(!reg.test(lis[2].value)){
+            labels[3].innerHTML="密码不合法";
+        }else if(lis[1].value!==lis[2].value){
+            labels[3].innerHTML="密码不一致";
+        }else{
+            labels[3].innerHTML="密码合法";
+            useable=true;
+        }
+    })
+
+    btn.addEventListener('click',function(e){
+        if(reg.test(lis[0].value)&&reg.test(lis[1].value)&&lis[1].value===lis[2].value){
+            useable=true;
+            return true;
+        }else{
+            labels[1].innerHTML="账号或密码格式不正确";
+            labels[2].innerHTML="账号或密码格式不正确";
+            labels[3].innerHTML="账号或密码格式不正确";
+            useable=false;
+            e.preventDefault();
+        }
+    })
+    
+    function f(e) {
+            if(lis[3].checked){
+                return lis[3].value;
+            }else return lis[4].value;
+    }
+    
+    form[0].addEventListener('submit',function (e){
+        if(useable){
+            e.preventDefault();
+            let user = {
+                username:lis[0].value,
+                password:lis[2].value,
+                status:f(e)
+            }
+            alert(user.status);
+        }else {
+            e.preventDefault();
+        }
+    })
+</script>
+</html>

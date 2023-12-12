@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商城首页</title>
+</head>
+<body>
+    <div class="shell">
+        <div class="a">
+            <a href="/cpp/user_config" class="userimg"></a>
+        </div>
+        <div class="b"></div>
+        <div class="c">
+            <ul class="selections">
+                <li class="selection"><a href="/cpp/main">中心</a></li>
+                <li class="selection"><a href="/cpp/cart">购物车</a></li>
+                <li class="selection"><a href="/cpp/order">订单</a></li>
+                <li class="selection"><a href="/cpp/itemAdd">商品管理</a></li>
+            </ul>
+        </div>
+        <div class="d">
+            <div class="group_div">
+                <ul class="groups">
+                    <li class="group"><a href="/cpp/search">搜索</a></li>
+                    <li class="group"><a href="/cpp/found_Type">发现</a></li>
+                </ul>
+            </div>
+            <div class="typeandcomodities">
+                <div class="tableshell">
+                    <table>
+                        <form>
+                            <tr>
+                                <td><button class="type" value="手机">手机</button></td>
+                                <td><button class="type" value="buttonname">电脑</button></td>
+                                <td><button class="type" value="buttonname">游戏</button></td>
+                                <td><button class="type" value="buttonname">日用</button></td>
+                            </tr>
+                            <tr>
+                                <td><button class="type" value="buttonname">1</button></td>
+                                <td><button class="type" value="buttonname">1</button></td>
+                                <td><button class="type" value="buttonname">1</button></td>
+                                <td><button class="type" value="buttonname">1</button></td>
+                            </tr>
+                            <tr>
+                                <td><button class="type" value="buttonname">1</button></td>
+                                <td><button class="type" value="buttonname">1</button></td>
+                                <td><button class="type" value="buttonname">1</button></td>
+                                <td><button class="type" value="buttonname">1</button></td>
+                            </tr>
+                        </form>
+                    </table>
+                </div>
+                <form style="width: 100%">
+                    <div class="comodities" style="height: 70%">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+<link rel="stylesheet" href="../static/css/main-type.css">
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/1.5.0/axios.js"></script>
+<link rel="stylesheet" type="text/css" href="http://css.huangwx.cn/css/sweetalert.css">
+<script type="text/javascript" src="http://css.huangwx.cn/js/sweetalert-dev.js"></script>
+<script>
+    axios.get("/cpp/item_get",function (){
+    }).then(value => {
+        for(var i=0;i<value.data.length;i++){
+            var item = document.createElement('div');
+            item.innerHTML=`<div class="comodity">
+                    <div class="comodityImg" ></div>
+                    <div class="comodityInfo">
+                        <ul class="Info">
+                            <li class="price">`+value.data[i].price+`</li>
+                            <li class="name">`+value.data[i].itemname+`</li>
+                            <li class="store">`+value.data[i].storage+`</li>
+                        </ul>
+                    </div>
+                    <div class="comodityCtrl">
+                        <div class="car">
+<!--                                <a href="/cpp/car/`+value.data[i].cid+`" class="carctrl" target="_blank"><img src="https://tse4-mm.cn.bing.net/th/id/OIP-C._2lHR4R08luMbpdWT2JMAwHaHa?w=216&h=217&c=7&r=0&o=5&pid=1.7" ></a>-->
+<!--                                    <button type="button" value="`+value.data[i].cid+`" onclick="cart()">购物车</button>-->
+                                    <button type="button" value="\`+value.data[i].cid+\`" onclick="cart()"><img src="https://tse4-mm.cn.bing.net/th/id/OIP-C._2lHR4R08luMbpdWT2JMAwHaHa?w=216&h=217&c=7&r=0&o=5&pid=1.7" alt=""></button>
+                        </div>
+                        <div class="buy">
+<!--                                <a href="/cpp/buy/`+value.data[i].cid+`" class="buyctrl" target="_blank"><img src="https://bpic.588ku.com/element_origin_min_pic/19/06/25/ab699ae66f033ef390a64370c771ced2.jpg"></a>-->
+                                    <button type="button" value="`+value.data[i].cid+`" onclick="seckill()"></button>
+                        </div>
+                    </div>
+                </div>`;
+            var comodities = document.getElementsByClassName('comodities');
+            item.style.display='grid';  //正常显示样式
+            comodities[0].appendChild(item);
+        }
+    })
+
+    //通过选择的类型切换商品
+    var types = document.getElementsByClassName('type');
+    for(let i=0; i<types.length; i++){
+        types[i].addEventListener('click', evt => {
+            evt.preventDefault();
+            var comodities = document.getElementsByClassName('comodities');
+            comodities[0].innerHTML='';
+            axios.get("/cpp/item_search",{
+                params:{
+                    param1:"itemtype",
+                    param2:types[i].value
+                }
+            }).then(value1 => {
+                for(i=0;i<value1.data.length;i++){
+                    var item = document.createElement('div');
+                    item.innerHTML=`<div class="comodity">
+                    <div class="comodityImg" ></div>
+                    <div class="comodityInfo">
+                        <ul class="Info">
+                            <li class="price">`+value1.data[i].price+`</li>
+                            <li class="name">`+value1.data[i].itemname+`</li>
+                            <li class="store">`+value1.data[i].storage+`</li>
+                        </ul>
+                    </div>
+                    <div class="comodityCtrl">
+                        <div class="car">
+<!--                                <a href="/cpp/car/`+value1.data[i].cid+`" class="carctrl" target="_blank"><img src="https://tse4-mm.cn.bing.net/th/id/OIP-C._2lHR4R08luMbpdWT2JMAwHaHa?w=216&h=217&c=7&r=0&o=5&pid=1.7" ></a>-->
+                                    <button type="button" value="`+value1.data[i].cid+`" onclick="cart()">购物车</button>
+                        </div>
+                        <div class="buy">
+<!--                                <a href="/cpp/buy/`+value1.data[i].cid+`" class="buyctrl" target="_blank"><img src="https://bpic.588ku.com/element_origin_min_pic/19/06/25/ab699ae66f033ef390a64370c771ced2.jpg"></a>-->
+                                    <button type="button" value="\`+value.data[i].cid+\`" onclick="seckill()"><img src="https://bpic.588ku.com/element_origin_min_pic/19/06/25/ab699ae66f033ef390a64370c771ced2.jpg" alt=""></button>
+<!--                                    <button type="button" value="`+value1.data[i].cid+`" onclick="seckill()"></button>-->
+                        </div>
+                    </div>
+                </div>`;
+                    var comodities = document.getElementsByClassName('comodities');
+                    item.style.display='grid';  //正常显示样式
+                    comodities[0].appendChild(item);
+                }
+            })
+        });
+    }
+    function cart(){
+        let element = event.currentTarget;
+        axios.post("/",null,{
+            cid:element.value
+        }).then(value => {
+            if (value){
+                swal("成功添加至购物车");
+            }else {
+                swal("出现错误，请重试")
+            }
+        })
+    }
+    function seckill(){
+        let element = event.currentTarget;
+        axios.post("/",null,{
+            cid:element.value
+        }).then(value => {
+            if (value){
+                swal("成功添加至订单");
+            }else {
+                swal("出现错误，请重试");
+            }
+        })
+    }
+</script>
+</html>

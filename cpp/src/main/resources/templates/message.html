@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${msg}"></title>
+</head>
+<body>
+<input type="hidden" th:value="${msg}" id="msg">
+<div>
+    <label id="judgement">hello</label>
+    <label></label>
+    <label></label>
+    <label></label>
+</div>
+</body>
+<link rel="stylesheet" href="http://127.0.0.1:9103/static/css/message.css">
+<script>
+    let msg = document.getElementById("msg");
+    let judgement = document.getElementById("judgement");
+
+    if(msg.value==="1"){
+        judgement.innerHTML="请先进行登录操作,5秒后将跳转至登录页面";
+        setTimeout(function (){
+            location.href="/";
+        },5000)
+    }else if(msg.value==="2"){
+        judgement.innerHTML="用户余额不足或库存不足，请重试";
+    }else{
+        judgement.innerHTML="操作成功";
+    }
+</script>
+</html>

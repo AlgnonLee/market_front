@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商城首页</title>
+</head>
+<body>
+    <div class="shell">
+        <div class="a">
+            <a href="/cpp/user_config" class="userimg"></a>
+        </div>
+        <div class="b"></div>
+        <div class="c">
+            <ul class="selections">
+                <li class="selection"><a href="/cpp/main">中心</a></li>
+                <li class="selection"><a href="/cpp/cart">购物车</a></li>
+                <li class="selection"><a href="/cpp/order">订单</a></li>
+                <li class="selection"><a href="/cpp/itemAdd">商品管理</a></li>
+            </ul>
+        </div>
+        <div class="d">
+                <div class="comodities" id="comodities">
+                    <template>
+                        <el-table :data="tableData" border stripe style="width: 100%" max-height="700">
+                            <el-table-column prop="cid" label="编号" width="180"></el-table-column>
+                            <el-table-column prop="storage" label="库存" width="180"></el-table-column>
+                            <el-table-column prop="price" label="价格" width="180"></el-table-column>
+                            <el-table-column prop="itemtype" label="类型" width="180"></el-table-column>
+                            <el-table-column prop="itemname" label="名称"></el-table-column>
+                            <el-table-column label="操作" width="270">
+                                <template slot-scope="scope">
+<!--                                    <el-button @click="handlePlus" type="primary" icon="el-icon-plus"></el-button>-->
+                                    <el-button @click="handleEdit(scope.$index, scope.row)" type="primary" icon="el-icon-edit"></el-button>
+                                    <el-button @click="handleDelete(scope.$index, scope.row)" type="danger" icon="el-icon-delete"></el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <el-dialog
+                                title="修改"
+                                :visible.sync="edit_dialog"
+                                width="50%"
+                        >
+                            <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="70px">
+                                <el-form-item label="编号">
+                                    <el-input v-model="editForm.cid" disabled></el-input>
+                                </el-form-item>
+                                <el-form-item label="价格" prop="price">
+                                    <el-input v-model="editForm.price"></el-input>
+                                </el-form-item>
+                                <el-form-item label="类型" prop="itemtype">
+                                    <el-input v-model="editForm.itemtype"></el-input>
+                                </el-form-item>
+                                <el-form-item label="名称" prop="itemname">
+                                    <el-input v-model="editForm.itemname"></el-input>
+                                </el-form-item>
+                                <el-form-item label="库存" prop="storage">
+                                    <el-input v-model="editForm.storage"></el-input>
+                                </el-form-item>
+                            </el-form>
+                            <span slot="footer" class="dialog-footer">
+                                <el-button @click="edit_dialog = false">取 消</el-button>
+                                <el-button type="primary" @click="editItemInfo">确 定</el-button>
+                            </span>
+                        </el-dialog>
+                        <el-dialog
+                            title="删除"
+                            :visible.sync="delete_dialog"
+                            width="50%">
+                        <el-form :model="deleteForm" ref="deleteFormRef" label-width="70px">
+                            <el-form-item label="编号">
+                                <el-input v-model="deleteForm.cid" disabled></el-input>
+                            </el-form-item>
+                            <el-form-item label="价格" prop="price">
+                                <el-input v-model="deleteForm.price" disabled></el-input>
+                            </el-form-item>
+                            <el-form-item label="类型" prop="itemtype">
+                                <el-input v-model="deleteForm.itemtype" disabled></el-input>
+                            </el-form-item>
+                            <el-form-item label="名称" prop="itemname">
+                                <el-input v-model="deleteForm.itemname" disabled></el-input>
+                            </el-form-item>
+                            <el-form-item label="库存" prop="storage">
+                                <el-input v-model="deleteForm.storage" disabled></el-input>
+                            </el-form-item>
+                        </el-form>
+                        <span slot="footer" class="dialog-footer">
+                                <el-button @click="delete_dialog = false">取 消</el-button>
+                                <el-button type="primary" @click="deleteItemInfo">确 定</el-button>
+                            </span>
+                        </el-dialog>
+                        <el-dialog
+                                title="新增(仅商户)"
+                                :visible.sync="plus_dialog"
+                                width="50%">
+                            <el-form :model="plusForm" :rules="editFormRules" ref="plusFormRef" label-width="70px">
+                                <el-form-item label="价格" prop="price">
+                                    <el-input v-model="plusForm.price"></el-input>
+                                </el-form-item>
+                                <el-form-item label="类型" prop="itemtype">
+                                    <el-input v-model="plusForm.itemtype"></el-input>
+                                </el-form-item>
+                                <el-form-item label="名称" prop="itemname">
+                                    <el-input v-model="plusForm.itemname"></el-input>
+                                </el-form-item>
+                                <el-form-item label="库存" prop="storage">
+                                    <el-input v-model="plusForm.storage"></el-input>
+                                </el-form-item>
+                            </el-form>
+                            <span slot="footer" class="dialog-footer">
+                                <el-button @click="plus_dialog = false">取 消</el-button>
+                                <el-button type="primary" @click="plusItemInfo">确 定</el-button>
+                            </span>
+                        </el-dialog>
+                        <div style="margin-top: 20px">
+                            <el-button @click="handlePlus">添加商品</el-button>
+                        </div>
+                    </template>
+                </div>
+        </div>
+    </div>
+</body>
+<link rel="stylesheet" href="../static/css/main-additem.css">
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/1.5.0/axios.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+
+    new Vue({
+        el:'#comodities',
+        data(){
+            var checkNotNull = (rule,value,callback)=>{
+                if(value===null)
+                {
+                    callback(new Error("数据错误，请重新输入"))
+                }
+            }
+            return{
+                tableData: [],
+                edit_dialog:false,
+                editForm:{},
+                editFormRules:{
+                    storage:[
+                        {required:true},
+                        {validator:checkNotNull}
+                    ],
+                    price:[
+                        {required:true},
+                        {validator:checkNotNull}
+                    ],
+                    itemname:[
+                        {required:true},
+                        {validator:checkNotNull}
+                    ],
+                    itemtype:[
+                        {required:true},
+                        {validator:checkNotNull}
+                    ]
+                },
+                delete_dialog:false,
+                deleteForm:{},
+                plus_dialog:false,
+                plusForm:{}
+            }
+        },
+        mounted(){
+            this.getItem()
+        },
+        methods:{
+            getItem(){
+                let _this=this;
+                axios.post("/cpp/get_item_store").then(value => {
+                    _this.tableData=value.data;
+                })
+            },
+            handleEdit(index,row){
+                this.edit_dialog=true;
+                this.editForm=(index,row);
+                // console.log(index,row)
+            },
+            editItemInfo(){
+                let _this = this;
+                axios.post("/cpp/edit_item",_this.editForm);
+                this.getItem();
+            },
+            handleDelete(index,row){
+                // this.$confirm("要执行删除操作吗").then(_=>{
+                    this.delete_dialog=true;
+                    this.deleteForm=(index,row)
+                // });
+            },
+            deleteItemInfo(){
+                let _this = this;
+                this.$confirm("要执行删除操作吗").then(_=>{
+                    axios.post("/cpp/delete_item",_this.deleteForm)
+                });
+                this.getItem();
+            },
+            handlePlus(){
+                this.plus_dialog=true;
+            },
+            plusItemInfo(){
+                let _this=this;
+                console.log(_this.plusForm);
+                this.$confirm("确认新增商品操作").then(_=>{
+                    axios.post("/cpp/plus_item",_this.plusForm).then(value => {
+                        _this.$message(value.data);
+                    });
+                })
+            }
+        }
+    })
+
+    
+</script>
+</html>
